@@ -29,14 +29,8 @@ import (
 )
 
 type keyValueWithDupInfo struct {
-<<<<<<< HEAD
-	newKV  keyValue
+	newKey kv.Key
 	dupErr error
-=======
-	newKey       kv.Key
-	dupErr       error
-	commonHandle bool
->>>>>>> 968d0d7... executor: cleanup useless code in batch checker (#19511)
 }
 
 type toBeCheckedRow struct {
@@ -112,16 +106,8 @@ func getKeysNeedCheckOneRow(ctx sessionctx.Context, t table.Table, row []types.D
 	if handleCol != nil {
 		handle := row[handleCol.Offset].GetInt64()
 		handleKey = &keyValueWithDupInfo{
-<<<<<<< HEAD
-			newKV: keyValue{
-				key:   t.RecordKey(handle),
-				value: newRowValue,
-			},
-			dupErr: kv.ErrKeyExists.FastGenByArgs(strconv.FormatInt(handle, 10), "PRIMARY"),
-=======
 			newKey: t.RecordKey(handle),
-			dupErr: kv.ErrKeyExists.FastGenByArgs(stringutil.MemoizeStr(fn), "PRIMARY"),
->>>>>>> 968d0d7... executor: cleanup useless code in batch checker (#19511)
+			dupErr: kv.ErrKeyExists.FastGenByArgs(strconv.FormatInt(handle, 10), "PRIMARY"),
 		}
 	}
 
@@ -150,16 +136,8 @@ func getKeysNeedCheckOneRow(ctx sessionctx.Context, t table.Table, row []types.D
 			return nil, err1
 		}
 		uniqueKeys = append(uniqueKeys, &keyValueWithDupInfo{
-<<<<<<< HEAD
-			newKV: keyValue{
-				key: key,
-			},
+			newKey: key,
 			dupErr: kv.ErrKeyExists.FastGenByArgs(colValStr, v.Meta().Name),
-=======
-			newKey:       key,
-			dupErr:       kv.ErrKeyExists.FastGenByArgs(colValStr, v.Meta().Name),
-			commonHandle: t.Meta().IsCommonHandle,
->>>>>>> 968d0d7... executor: cleanup useless code in batch checker (#19511)
 		})
 	}
 	result = append(result, toBeCheckedRow{
