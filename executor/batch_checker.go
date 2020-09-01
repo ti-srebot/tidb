@@ -28,19 +28,19 @@ import (
 	"github.com/pingcap/tidb/util/chunk"
 )
 
-type keyValue struct {
-	key   kv.Key
-	value []byte
-}
-
 type keyValueWithDupInfo struct {
+<<<<<<< HEAD
 	newKV  keyValue
 	dupErr error
+=======
+	newKey       kv.Key
+	dupErr       error
+	commonHandle bool
+>>>>>>> 968d0d7... executor: cleanup useless code in batch checker (#19511)
 }
 
 type toBeCheckedRow struct {
 	row        []types.Datum
-	rowValue   []byte
 	handleKey  *keyValueWithDupInfo
 	uniqueKeys []*keyValueWithDupInfo
 	// t is the table or partition this row belongs to.
@@ -108,19 +108,20 @@ func getKeysNeedCheckOneRow(ctx sessionctx.Context, t table.Table, row []types.D
 
 	var handleKey *keyValueWithDupInfo
 	uniqueKeys := make([]*keyValueWithDupInfo, 0, nUnique)
-	newRowValue, err := encodeNewRow(ctx, t, row)
-	if err != nil {
-		return nil, err
-	}
 	// Append record keys and errors.
 	if handleCol != nil {
 		handle := row[handleCol.Offset].GetInt64()
 		handleKey = &keyValueWithDupInfo{
+<<<<<<< HEAD
 			newKV: keyValue{
 				key:   t.RecordKey(handle),
 				value: newRowValue,
 			},
 			dupErr: kv.ErrKeyExists.FastGenByArgs(strconv.FormatInt(handle, 10), "PRIMARY"),
+=======
+			newKey: t.RecordKey(handle),
+			dupErr: kv.ErrKeyExists.FastGenByArgs(stringutil.MemoizeStr(fn), "PRIMARY"),
+>>>>>>> 968d0d7... executor: cleanup useless code in batch checker (#19511)
 		}
 	}
 
@@ -149,15 +150,20 @@ func getKeysNeedCheckOneRow(ctx sessionctx.Context, t table.Table, row []types.D
 			return nil, err1
 		}
 		uniqueKeys = append(uniqueKeys, &keyValueWithDupInfo{
+<<<<<<< HEAD
 			newKV: keyValue{
 				key: key,
 			},
 			dupErr: kv.ErrKeyExists.FastGenByArgs(colValStr, v.Meta().Name),
+=======
+			newKey:       key,
+			dupErr:       kv.ErrKeyExists.FastGenByArgs(colValStr, v.Meta().Name),
+			commonHandle: t.Meta().IsCommonHandle,
+>>>>>>> 968d0d7... executor: cleanup useless code in batch checker (#19511)
 		})
 	}
 	result = append(result, toBeCheckedRow{
 		row:        row,
-		rowValue:   newRowValue,
 		handleKey:  handleKey,
 		uniqueKeys: uniqueKeys,
 		t:          t,

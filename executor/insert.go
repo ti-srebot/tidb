@@ -114,10 +114,10 @@ func prefetchUniqueIndices(ctx context.Context, txn kv.Transaction, rows []toBeC
 	batchKeys := make([]kv.Key, 0, nKeys)
 	for _, r := range rows {
 		if r.handleKey != nil {
-			batchKeys = append(batchKeys, r.handleKey.newKV.key)
+			batchKeys = append(batchKeys, r.handleKey.newKey)
 		}
 		for _, k := range r.uniqueKeys {
-			batchKeys = append(batchKeys, k.newKV.key)
+			batchKeys = append(batchKeys, k.newKey)
 		}
 	}
 	return txn.BatchGet(ctx, batchKeys)
@@ -133,8 +133,13 @@ func prefetchConflictedOldRows(ctx context.Context, txn kv.Transaction, rows []t
 	batchKeys := make([]kv.Key, 0, len(rows))
 	for _, r := range rows {
 		for _, uk := range r.uniqueKeys {
+<<<<<<< HEAD
 			if val, found := values[string(uk.newKV.key)]; found {
 				handle, err := tables.DecodeHandle(val)
+=======
+			if val, found := values[string(uk.newKey)]; found {
+				handle, err := tablecodec.DecodeHandleInUniqueIndexValue(val, uk.commonHandle)
+>>>>>>> 968d0d7... executor: cleanup useless code in batch checker (#19511)
 				if err != nil {
 					return err
 				}
@@ -195,7 +200,7 @@ func (e *InsertExec) batchUpdateDupRows(ctx context.Context, newRows [][]types.D
 
 	for i, r := range toBeCheckedRows {
 		if r.handleKey != nil {
-			handle, err := tablecodec.DecodeRowKey(r.handleKey.newKV.key)
+			handle, err := tablecodec.DecodeRowKey(r.handleKey.newKey)
 			if err != nil {
 				return err
 			}
@@ -210,7 +215,7 @@ func (e *InsertExec) batchUpdateDupRows(ctx context.Context, newRows [][]types.D
 		}
 
 		for _, uk := range r.uniqueKeys {
-			val, err := txn.Get(ctx, uk.newKV.key)
+			val, err := txn.Get(ctx, uk.newKey)
 			if err != nil {
 				if kv.IsErrNotFound(err) {
 					continue
@@ -228,8 +233,13 @@ func (e *InsertExec) batchUpdateDupRows(ctx context.Context, newRows [][]types.D
 					// Data index inconsistent? A unique key provide the handle information, but the
 					// handle points to nothing.
 					logutil.BgLogger().Error("get old row failed when insert on dup",
+<<<<<<< HEAD
 						zap.String("uniqueKey", hex.EncodeToString(uk.newKV.key)),
 						zap.Int64("handle", handle),
+=======
+						zap.String("uniqueKey", hex.EncodeToString(uk.newKey)),
+						zap.Stringer("handle", handle),
+>>>>>>> 968d0d7... executor: cleanup useless code in batch checker (#19511)
 						zap.String("toBeInsertedRow", types.DatumsToStrNoErr(r.row)))
 				}
 				return err
