@@ -376,20 +376,11 @@ func aggregateType(args []Expression) *types.FieldType {
 	return types.AggFieldType(fieldTypes)
 }
 
-<<<<<<< HEAD
-// GetCmpTp4MinMax gets compare type for GREATEST and LEAST and BETWEEN (mainly for datetime).
-func GetCmpTp4MinMax(args []Expression) (argTp types.EvalType) {
-	datetimeFound, isAllStr := false, true
-	cmpEvalType, isStr, isTemporalWithDate := temporalWithDateAsNumEvalType(args[0].GetType())
-	if !isStr {
-		isAllStr = false
-=======
 // ResolveType4Between resolves eval type for between expression.
 func ResolveType4Between(args [3]Expression) types.EvalType {
 	cmpTp := args[0].GetType().EvalType()
 	for i := 1; i < 3; i++ {
 		cmpTp = getBaseCmpType(cmpTp, args[i].GetType().EvalType(), nil, nil)
->>>>>>> dd0dc46d5... expression: fix type infer for tidb's builtin compare(least and greatest) (#21150)
 	}
 
 	hasTemporal := false
@@ -1104,12 +1095,9 @@ func getBaseCmpType(lhs, rhs types.EvalType, lft, rft *types.FieldType) types.Ev
 	} else if ((lhs == types.ETInt || (lft != nil && lft.Hybrid())) || lhs == types.ETDecimal) &&
 		((rhs == types.ETInt || (rft != nil && rft.Hybrid())) || rhs == types.ETDecimal) {
 		return types.ETDecimal
-<<<<<<< HEAD
-=======
 	} else if lft != nil && rft != nil && (types.IsTemporalWithDate(lft.Tp) && rft.Tp == mysql.TypeYear ||
 		lft.Tp == mysql.TypeYear && types.IsTemporalWithDate(rft.Tp)) {
 		return types.ETDatetime
->>>>>>> dd0dc46d5... expression: fix type infer for tidb's builtin compare(least and greatest) (#21150)
 	}
 	return types.ETReal
 }

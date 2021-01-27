@@ -723,14 +723,9 @@ func (b *builtinLeastTimeSig) vecEvalString(input *chunk.Chunk, result *chunk.Co
 	sc := b.ctx.GetSessionVars().StmtCtx
 	n := input.NumRows()
 
-<<<<<<< HEAD
-	var findInvalidTime []bool = make([]bool, n)
-	var invalidValue []string = make([]string, n)
-=======
 	dstStrings := make([]string, n)
 	// TODO: use Column.MergeNulls instead, however, it doesn't support var-length type currently.
 	dstNullMap := make([]bool, n)
->>>>>>> dd0dc46d5... expression: fix type infer for tidb's builtin compare(least and greatest) (#21150)
 
 	for j := 0; j < len(b.args); j++ {
 		if err := b.args[j].VecEvalString(b.ctx, input, result); err != nil {
